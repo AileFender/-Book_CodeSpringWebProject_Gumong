@@ -1,16 +1,23 @@
 package org.zerock.controller;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import org.zerock.domain.SampleVO;
+import org.zerock.domain.Ticket;
 
 import lombok.extern.log4j.Log4j;
 
@@ -56,5 +63,40 @@ public class SampleController {
 		map.put("Second", new SampleVO(222, "로버트", "시니어"));
 		
 		return map;
+	}
+	
+	@GetMapping(value = "/check", params = { "height", "weight" })
+	public ResponseEntity<SampleVO> check (Double height, Double weight) {
+		
+		SampleVO vo = new SampleVO(0, "" + height, "" + weight);
+		
+		ResponseEntity<SampleVO> result = null;
+		
+		if (height < 150) {
+			
+			result = ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(vo);
+			
+		} else {
+			result = ResponseEntity.status(HttpStatus.OK).body(vo);
+		}
+		
+		return result;
+	}
+	
+	@GetMapping("/product/{cat}/{pid}/{title}")
+	public String[] getPath(
+			@PathVariable("cat") String cat,
+			@PathVariable("pid") Integer pid,
+			@PathVariable("title") String title) {
+		return new String[] { "Category : " + cat, "Product ID : " + pid , "Title : " + title};
+	}
+
+	@PostMapping("/ticket")
+	public Ticket convert (@RequestBody Ticket ticket) {
+		
+		log.info("Convert......... Ticket" + ticket);
+		
+		return ticket;
+
 	}
 }
